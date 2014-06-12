@@ -1,0 +1,20 @@
+#!/bin/sh
+# Author: Olivier Tille<olivier.tille@gmail.com>
+# Pre push hook that will check if you are about to push more than 1 commit at the time
+# in what case it will ask you if you want to continue the push
+# 
+DIFF=$(($(git rev-list HEAD --not --remotes | grep "" -c) + 0))
+if [ $DIFF -gt 1 ]; then
+  echo "You are about to push the following ${DIFF} commits:"
+  git log -n $DIFF --oneline
+  exec < /dev/tty
+  while true; do
+    read -p "Are you sure? (y/N): " ANSW
+    if [ "$ANSW" = "y" ]; then
+      exit 0
+    else
+      exit 1
+    fi
+  done
+fi
+exit 0
